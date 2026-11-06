@@ -5,4 +5,6 @@
 - データはすべて架空です。ブラウザの中だけで動き、メールは送信しません。
 - 公開URL: https://ai-flow-architect.github.io/dance-studio-booking-demo/
 
+写真：Wikimedia Commons（CC0／CC BY 2.0・出典は画面の下に記載）。写真はイメージです。
+
 ![画面](screenshot.png)

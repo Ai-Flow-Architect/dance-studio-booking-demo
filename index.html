@@ -13,108 +13,180 @@
 <meta property="og:image" content="https://ai-flow-architect.github.io/dance-studio-booking-demo/screenshot.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Kaku+Gothic+New:wght@700;900&family=Barlow:wght@500;600&display=swap">
 <style>
-/* 白ベース固定（端末がダークモードでも暗くしない） */
+/* 白地・墨色のボタン・写真カード＋1週間の空き状況（参考＝スペース予約サイトの一覧）。端末がダークでも白のまま */
 :root,:root[data-theme="dark"]{color-scheme:light}
 :root{
-  --bg:#f6f5f2; --surface:#fff; --ink:#1d1b22; --muted:#66626e; --line:#e2dfe6;
-  --accent:#c2185b; --accent-soft:#fce4ec; --ok:#2e7d4f; --ok-soft:#e3f3e8; --bad:#b3261e; --bad-soft:#fbe5e3;
-  --s1:#c2185b; --s2:#1565c0; --s3:#ef6c00;
-  --f-head:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
-  --f-body:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  --paper:#ffffff; --mist:#f4f5f7; --line:#e4e4e8; --ink:#1c1d21; --sub:#6b6d75; --graphite:#2e2f33;
+  --stage:#1e7fd8; --stage-soft:#e8f2fc; --spot:#e4405f; --spot-soft:#fdecef; --ok:#1f8a5b; --ok-soft:#e6f4ee;
+  --s1:#2e2f33; --s2:#1e7fd8; --s3:#c2773a;
+  --f-head:"Zen Kaku Gothic New","Noto Sans JP",system-ui,sans-serif;
+  --f-body:"Noto Sans JP","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+  --f-num:"Barlow","Noto Sans JP",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.65}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-weight:400;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
-.top-in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 16px;max-width:1200px;margin:0 auto}
-.brand{margin-right:auto;font-family:var(--f-head);font-weight:900;font-size:19px;letter-spacing:.03em}
-.brand small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-left:8px}
-nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
-nav.tabs button{border:1px solid transparent;background:none;padding:6px 12px;border-radius:999px;color:var(--muted)}
-nav.tabs button[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
-.note{background:#fff8e1;font-size:12px}
-.note div{max-width:1200px;margin:0 auto;padding:6px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.note button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:2px 10px;font-size:12px}
-main{max-width:1200px;margin:0 auto;padding:18px 16px 60px}
-h1{font-family:var(--f-head);font-size:24px;margin:0 0 4px}
-h2{font-size:13px;letter-spacing:.08em;color:var(--muted);margin:22px 0 8px}
-.lead{color:var(--muted);margin:0 0 16px}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
-.steps{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px;padding:0;list-style:none}
-.steps li{padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:12.5px}
-.steps li.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
-.steps li.done{color:var(--ink)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.card{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-top:5px solid var(--c,var(--accent))}
-.card:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
-.card b{display:block;font-family:var(--f-head);font-size:17px}
-.card span{color:var(--muted);font-size:12.5px}
-.back{border:0;background:none;color:var(--accent);padding:0;margin-bottom:10px}
-.lesson-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface);margin-bottom:8px}
-.lesson-row .d{font-weight:700;min-width:150px}
-.lesson-row .t{flex:1;min-width:180px}
-.lesson-row .t small{color:var(--muted);display:block}
-.chip{display:inline-block;font-size:11.5px;padding:1px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
-.chip.ok{background:var(--ok-soft);color:var(--ok)}
-.chip.bad{background:var(--bad-soft);color:var(--bad)}
-.btn{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:8px 16px;font-weight:700}
-.btn:disabled{background:#c9c5cd;cursor:not-allowed}
-.btn.sub{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:400}
+:focus-visible{outline:2px solid var(--stage);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 上の帯 */
+header.top{position:sticky;top:0;z-index:20;background:var(--paper);box-shadow:0 1px 0 var(--line),0 6px 16px rgba(20,20,30,.04)}
+.top-in{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:12px 24px;max-width:1240px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand b{font-family:var(--f-head);font-weight:900;font-size:20px;letter-spacing:.04em}
+.brand b i{font-style:normal;color:var(--stage)}
+.brand small{font-size:11.5px;color:var(--sub)}
+nav.tabs{display:flex;gap:2px;flex-wrap:wrap}
+nav.tabs button{border:0;background:none;padding:8px 14px;color:var(--sub);font-weight:700;font-size:13px;border-bottom:2px solid transparent}
+nav.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.note{background:var(--mist);font-size:12px;color:var(--sub)}
+.note div{max-width:1240px;margin:0 auto;padding:6px 24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.note button{border:1px solid var(--line);background:var(--paper);border-radius:4px;padding:2px 10px;font-size:12px}
+main{max-width:1240px;margin:0 auto;padding:22px 24px 72px}
+@media (max-width:700px){.top-in,main,.note div{padding-left:14px;padding-right:14px}}
+h1{font-family:var(--f-head);font-weight:900;font-size:26px;letter-spacing:.02em;margin:0 0 4px;line-height:1.35}
+h2{font-size:13px;letter-spacing:.06em;color:var(--sub);margin:24px 0 10px;font-weight:700}
+.lead{color:var(--sub);margin:0 0 18px}
+
+/* 予約サイト：見出しと手順 */
+.crumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px;color:var(--sub);margin-bottom:14px}
+.crumb button{border:0;background:none;padding:0;color:var(--stage);font-weight:700}
+.crumb .sep{color:#b9bac0}
+.flow{display:flex;gap:0;margin:0 0 20px;padding:0;list-style:none;border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:12.5px}
+.flow li{flex:1;text-align:center;padding:8px 6px;color:var(--sub);background:var(--paper);border-right:1px solid var(--line)}
+.flow li:last-child{border-right:0}
+.flow li.on{background:var(--graphite);color:#fff;font-weight:700}
+.flow li.done{color:var(--ink);background:var(--mist)}
+
+/* スタジオ（写真カード） */
+.studios{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.scard{display:block;width:100%;padding:0;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--paper);overflow:hidden;transition:box-shadow .2s,transform .2s}
+.scard:hover{box-shadow:0 10px 24px rgba(20,20,30,.10);transform:translateY(-2px)}
+.ph{position:relative;aspect-ratio:4/3;background:var(--mist) center/cover no-repeat}
+.ph .badge{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.94);color:var(--ink);font-size:11.5px;font-weight:700;border-radius:3px;padding:2px 8px}
+.scard .body{padding:12px 14px 14px}
+.scard b{display:block;font-family:var(--f-head);font-size:18px;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--sub);font-size:12.5px;margin-top:2px}
+.meta span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#c9cad0;margin-right:6px;vertical-align:2px}
+.scard .genres{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+
+/* タグ・ジャンルの選択 */
+.tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:3px;background:var(--mist);color:var(--ink);white-space:nowrap}
+.tag.blue{background:var(--stage-soft);color:var(--stage)}
+.tag.red{background:var(--spot-soft);color:var(--spot)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.chip-btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 16px;font-weight:700;font-size:13px}
+.chip-btn:hover{border-color:var(--ink)}
+.chip-btn small{color:var(--sub);font-weight:400;margin-left:6px}
+
+/* レッスンのカード（写真＋1週間の空き） */
+.lcard{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;padding:18px 0;border-top:1px solid var(--line)}
+.lcard:last-child{border-bottom:1px solid var(--line)}
+.lcard .ph{border-radius:8px}
+.lhead{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.lcard h3{font-family:var(--f-head);font-weight:700;font-size:18px;margin:0;line-height:1.45}
+.price{display:flex;align-items:baseline;justify-content:flex-end;gap:4px;margin:4px 0 8px;color:var(--ink)}
+.price small{font-size:13px;color:var(--sub)}
+.price b{font-family:var(--f-num);font-weight:600;font-size:28px;line-height:1}
+.week{display:grid;grid-template-columns:28px repeat(7,minmax(0,1fr)) 28px;border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden}
+.week .nav{border:0;background:var(--mist);color:var(--stage);font-size:16px}
+.week .nav:disabled{color:#c7c8ce;cursor:default}
+.cell{border:0;border-left:1px solid var(--line);background:var(--paper);padding:6px 2px 8px;text-align:center;font-size:12px;line-height:1.35;min-width:0}
+.cell .w{color:var(--sub)} .cell .w.sun{color:var(--spot)} .cell .w.sat{color:var(--stage)}
+.cell .d{display:block;font-family:var(--f-num);font-weight:600;font-size:15px}
+.cell .m{display:block;font-size:17px;line-height:1.3;color:var(--stage)}
+.cell .t{display:block;font-family:var(--f-num);font-size:11px;color:var(--sub)}
+.cell.few .m{color:var(--spot)}
+.cell.full .m,.cell.none .m{color:#b9bac0}
+button.cell:hover{background:var(--stage-soft)}
+button.cell:disabled{cursor:not-allowed;background:var(--paper)}
+.legend-m{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--sub);margin-top:6px}
+@media (max-width:860px){.lcard{grid-template-columns:minmax(0,1fr)}.lcard .ph{aspect-ratio:16/9}}
+@media (max-width:480px){.week{grid-template-columns:22px repeat(7,minmax(0,1fr)) 22px}.cell .t{display:none}.cell .d{font-size:13px}}
+
+/* 予約の入力（右から出るシート） */
+.sheet-bg{position:fixed;inset:0;background:rgba(20,20,28,.42);z-index:30;display:flex;justify-content:flex-end}
+.sheet{width:min(460px,100%);height:100%;overflow:auto;background:var(--paper);box-shadow:-10px 0 30px rgba(0,0,0,.12);animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateX(24px);opacity:.4}to{transform:none;opacity:1}}
+.sheet .ph{aspect-ratio:16/9;border-radius:0}
+.sheet .in{padding:18px 22px 28px}
+.sheet .close{position:absolute;right:10px;top:10px;border:0;background:rgba(255,255,255,.94);border-radius:50%;width:34px;height:34px;font-size:18px}
+.when{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:12px 0 4px;font-size:13.5px}
+.when dt{color:var(--sub)} .when dd{margin:0;font-weight:700}
 .form{display:grid;gap:12px;max-width:520px}
-.form label{display:grid;gap:4px;font-size:13px}
-.form input,.form select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)}
-.err{color:var(--bad);font-size:13px;min-height:1.2em}
-.done-box{border:2px solid var(--ok);background:var(--ok-soft);border-radius:12px;padding:16px}
-/* カレンダー */
-.cal-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-.cal-head b{font-family:var(--f-head);font-size:18px;min-width:120px}
-.cal-head select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--surface)}
-.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface)}
-.cal .wd{font-size:12px;text-align:center;padding:4px;color:var(--muted);border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg)}
-.cal .day{min-height:96px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px;font-size:11.5px;min-width:0}
-.cal .day.out{background:#faf9f7;color:#aaa}
-.cal .day.today .n{background:var(--accent);color:#fff;border-radius:999px;padding:0 6px}
-.cal .n{font-weight:700;font-size:12px}
-.ev{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);border-radius:4px;padding:1px 4px;margin-top:3px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:8px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);margin-right:4px}
-@media (max-width:700px){.cal .day{min-height:70px}.ev{font-size:10px}}
-/* 管理画面 */
-.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.sub-tabs button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px}
-.sub-tabs button[aria-current="page"]{border-color:var(--accent);color:var(--accent);font-weight:700}
-table{width:100%;border-collapse:collapse;background:var(--surface);font-size:13px}
-th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
-th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg)}
-.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.form label{display:grid;gap:4px;font-size:13px;font-weight:700}
+.form input,.form select{border:1px solid var(--line);border-radius:4px;padding:9px 11px;background:var(--paper);font-weight:400}
+.form input:focus{border-color:var(--ink);outline:0}
+.btn{border:0;background:var(--graphite);color:#fff;border-radius:4px;padding:10px 18px;font-weight:700;font-size:13.5px}
+.btn:hover{background:#000}
+.btn:disabled{background:#c9cad0;cursor:not-allowed}
+.btn.sub{background:var(--paper);color:var(--ink);border:1px solid var(--line);font-weight:400}
+.btn.sub:hover{border-color:var(--ink)}
+.err{color:var(--spot);font-size:13px;min-height:1.2em}
+.done-box{border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:6px;padding:16px 18px;background:var(--paper)}
+.done-box b{font-family:var(--f-head);font-size:18px;color:var(--ok)}
+.empty{padding:28px;border:1px dashed var(--line);border-radius:8px;color:var(--sub);text-align:center}
+.foot{max-width:1240px;margin:0 auto;padding:18px 24px 40px;font-size:11px;color:var(--sub);border-top:1px solid var(--line)}
+
+/* 共通の箱・表（カレンダー・管理画面） */
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px}
+table{width:100%;border-collapse:collapse;background:var(--paper);font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--sub);font-weight:700;background:var(--mist)}
+.chip{display:inline-block;font-size:11.5px;padding:1px 9px;border-radius:3px;background:var(--mist);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.bad{background:var(--spot-soft);color:var(--spot)}
+.cal-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.cal-head b{font-family:var(--f-num);font-weight:600;font-size:22px;min-width:130px}
+.cal-head select{border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.cal .wd{font-size:12px;text-align:center;padding:5px;color:var(--sub);border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--mist)}
+.cal .day{min-height:100px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px;font-size:11.5px;min-width:0}
+.cal .day.out{background:#fafafb;color:#b9bac0}
+.cal .day.today .n{background:var(--ink);color:#fff;border-radius:3px;padding:0 6px}
+.cal .n{font-family:var(--f-num);font-weight:600;font-size:13px}
+.ev{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:var(--mist);border-radius:2px;padding:2px 5px;margin-top:3px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev:hover{background:var(--stage-soft)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-top:10px;color:var(--sub)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);margin-right:5px;vertical-align:-1px}
+@media (max-width:700px){.cal .day{min-height:72px;padding:3px}.ev{font-size:10px;padding:1px 3px}}
+.sub-tabs{display:flex;gap:0;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.sub-tabs button{border:0;border-bottom:2px solid transparent;background:none;padding:8px 14px;color:var(--sub);font-weight:700;font-size:13px}
+.sub-tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
 @media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
-.rule-box{border:1px dashed var(--accent);border-radius:10px;padding:12px;display:grid;gap:10px;background:#fffafc}
+.rule-box{border:1px solid var(--stage);border-radius:6px;padding:14px;display:grid;gap:10px;background:var(--stage-soft)}
+.rule-box > b{color:var(--stage)}
 .inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.inline label{display:flex;gap:4px;align-items:center}
-.preview{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px 12px 8px 34px;background:var(--surface);font-size:13px}
+.inline label{display:flex;gap:4px;align-items:center;font-weight:400}
+.preview{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:8px 12px 8px 34px;background:var(--paper);font-size:13px;font-family:var(--f-num)}
 .preview li{margin:2px 0}
-.mail{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);margin-bottom:8px}
-.mail .mh{font-size:12px;color:var(--muted)}
+.mail{border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--paper);margin-bottom:8px}
+.mail .mh{font-size:12px;color:var(--sub)}
 .mail pre{white-space:pre-wrap;font-family:var(--f-body);margin:6px 0 0}
-.tag-del{border:0;background:none;color:var(--bad);font-size:12px}
+.tag-del{border:0;background:none;color:var(--spot);font-size:12px}
+.reveal{animation:rise .35s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 
 <header class="top"><div class="top-in">
-  <div class="brand">ダンススタジオ予約<small>デモ（架空のスタジオ・架空のデータ）</small></div>
+  <div class="brand"><b>DANCE<i>.</i>BOOK</b><small>ダンススタジオ予約｜デモ（架空のスタジオ・架空のデータ）</small></div>
   <nav class="tabs" id="tabs">
-    <button data-tab="book" id="tab-book">予約サイト（お客様の画面）</button>
+    <button data-tab="book" id="tab-book">レッスンを予約</button>
     <button data-tab="calendar" id="tab-calendar">スタジオのカレンダー</button>
     <button data-tab="admin" id="tab-admin">管理画面</button>
   </nav>
 </div></header>
-<div class="note"><div><span>このデモはブラウザの中だけで動きます。メールは実際には送らず「送信箱」に記録します。</span><button id="reset">見本の状態に戻す</button></div></div>
+<div class="note"><div><span>このデモはブラウザの中だけで動きます。メールは実際には送らず「送信箱」に記録します。写真はイメージです。</span><button id="reset">見本の状態に戻す</button></div></div>
 <main id="app"></main>
+<footer class="foot" id="credits"></footer>
+
 <script>
 "use strict";
 // ===== 日付の道具（すべて端末の暦日・'YYYY-MM-DD' で扱う） =====
@@ -173,30 +245,30 @@ function seed() {
   const nextWd = wd => { let s = TODAY; while (parse(s).getDay() !== wd) s = addDays(s, 1); return s; };
   return {
     studios: [
-      { id: "s1", name: "スタジオ中央", area: "駅前・3F", color: "var(--s1)", notify: ["center@example.com", "owner@example.com"] },
-      { id: "s2", name: "スタジオ東口", area: "東口・B1", color: "var(--s2)", notify: ["east@example.com", "owner@example.com"] },
-      { id: "s3", name: "スタジオ港南", area: "港南・2F", color: "var(--s3)", notify: ["konan@example.com"] },
+      { id: "s1", name: "スタジオ中央", area: "駅前・3F", access: "中央駅 徒歩3分", size: "80㎡・鏡張り", photo: "p1", color: "var(--s1)", notify: ["center@example.com", "owner@example.com"] },
+      { id: "s2", name: "スタジオ東口", area: "東口・B1", access: "東口駅 徒歩5分", size: "60㎡・防音", photo: "p2", color: "var(--s2)", notify: ["east@example.com", "owner@example.com"] },
+      { id: "s3", name: "スタジオ港南", area: "港南・2F", access: "港南駅 徒歩2分", size: "120㎡・バーあり", photo: "p4", color: "var(--s3)", notify: ["konan@example.com"] },
     ],
     genres: [
       { id: "g1", name: "HIPHOP" }, { id: "g2", name: "JAZZ" }, { id: "g3", name: "K-POP" },
       { id: "g4", name: "キッズ" }, { id: "g5", name: "バレエ" },
     ],
     lessons: [
-      { id: "l1", studio: "s1", genre: "g1", title: "HIPHOP 初級", teacher: "講師 甲野", start: "19:00", end: "20:15", cap: 12, rule: { kind: "weekly", weekday: 2 } },
-      { id: "l2", studio: "s1", genre: "g3", title: "K-POP 入門", teacher: "講師 乙野", start: "18:00", end: "19:00", cap: 15, rule: { kind: "biweekly", weekday: 5, anchor: nextWd(5) } },
-      { id: "l3", studio: "s1", genre: "g5", title: "大人バレエ", teacher: "講師 丙野", start: "10:30", end: "12:00", cap: 8, rule: { kind: "monthly", weekday: 6, nths: [1, 3] } },
-      { id: "l4", studio: "s2", genre: "g2", title: "JAZZ 中級", teacher: "講師 丁野", start: "20:00", end: "21:15", cap: 10, rule: { kind: "weekly", weekday: 4 } },
-      { id: "l5", studio: "s2", genre: "g4", title: "キッズ HIPHOP", teacher: "講師 甲野", start: "16:30", end: "17:30", cap: 14, rule: { kind: "weekly", weekday: 3 } },
-      { id: "l6", studio: "s2", genre: "g1", title: "HIPHOP 振付クラス", teacher: "講師 戊野", start: "19:30", end: "21:00", cap: 12, rule: { kind: "monthly", weekday: 0, nths: [-1] } },
-      { id: "l7", studio: "s3", genre: "g3", title: "K-POP カバー", teacher: "講師 乙野", start: "19:00", end: "20:30", cap: 2, rule: { kind: "weekly", weekday: 1 } },
-      { id: "l8", studio: "s3", genre: "g4", title: "キッズ チア", teacher: "講師 丙野", start: "17:00", end: "18:00", cap: 12, rule: { kind: "monthly", weekday: 6, nths: [2] } },
+      { id: "l1", studio: "s1", genre: "g1", title: "HIPHOP 初級", level: "初心者歓迎", price: 2200, teacher: "講師 甲野", start: "19:00", end: "20:15", cap: 12, rule: { kind: "weekly", weekday: 2 } },
+      { id: "l2", studio: "s1", genre: "g3", title: "K-POP 入門", level: "初心者歓迎", price: 2200, teacher: "講師 乙野", start: "18:00", end: "19:00", cap: 15, rule: { kind: "biweekly", weekday: 5, anchor: nextWd(5) } },
+      { id: "l3", studio: "s1", genre: "g5", title: "大人バレエ", level: "大人から", price: 2750, teacher: "講師 丙野", start: "10:30", end: "12:00", cap: 8, rule: { kind: "monthly", weekday: 6, nths: [1, 3] } },
+      { id: "l4", studio: "s2", genre: "g2", title: "JAZZ 中級", level: "経験者向け", price: 2500, teacher: "講師 丁野", start: "20:00", end: "21:15", cap: 10, rule: { kind: "weekly", weekday: 4 } },
+      { id: "l5", studio: "s2", genre: "g4", title: "キッズ HIPHOP", level: "小学生", price: 1800, teacher: "講師 甲野", start: "16:30", end: "17:30", cap: 14, rule: { kind: "weekly", weekday: 3 } },
+      { id: "l6", studio: "s2", genre: "g1", title: "HIPHOP 振付クラス", level: "経験者向け", price: 3000, teacher: "講師 戊野", start: "19:30", end: "21:00", cap: 12, rule: { kind: "monthly", weekday: 0, nths: [-1] } },
+      { id: "l7", studio: "s3", genre: "g3", title: "K-POP カバー", level: "少人数", price: 2500, teacher: "講師 乙野", start: "19:00", end: "20:30", cap: 2, rule: { kind: "weekly", weekday: 1 } },
+      { id: "l8", studio: "s3", genre: "g4", title: "キッズ チア", level: "小学生", price: 1800, teacher: "講師 丙野", start: "17:00", end: "18:00", cap: 12, rule: { kind: "monthly", weekday: 6, nths: [2] } },
     ],
     bookings: [],
     outbox: [],
     confirmToCustomer: true,
   };
 }
-const KEY = "dance-booking-demo-v1";
+const KEY = "dance-booking-demo-v2";
 let db;
 try { db = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch (e) { db = seed(); }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { /* 保存できない環境でも画面は動かす */ } };
@@ -208,7 +280,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;"
 const HORIZON = 56; // 予約できるのは今日から8週間先まで
 
 // ===== 画面の状態 =====
-const ui = { tab: "book", step: 1, studio: null, genre: null, pick: null, done: null, calStudio: "all", calMonth: TODAY.slice(0, 7), adminTab: "cal", edit: null, err: "" };
+const ui = { tab: "book", step: 1, week: 0, studio: null, genre: null, pick: null, done: null, calStudio: "all", calMonth: TODAY.slice(0, 7), adminTab: "cal", edit: null, err: "" };
 
 function occurrences(filter, from, to) {
   const rows = [];
@@ -221,37 +293,65 @@ function occurrences(filter, from, to) {
 }
 
 // ===== 予約サイト =====
+function seatMark(l, d) {
+  const left = l.cap - booked(l.id, d);
+  if (left <= 0) return { m: "×", cls: "full", left };
+  if (left <= 2) return { m: "△", cls: "few", left };
+  if (left >= l.cap / 2) return { m: "◎", cls: "", left };
+  return { m: "○", cls: "", left };
+}
+function photo(s) { return "background-image:url('assets/" + s.photo + ".jpg')"; }
+function weekStrip(l) {
+  const start = addDays(TODAY, ui.week * 7);
+  const days = expand(l.rule, start, addDays(start, 6));
+  let h = '<div class="week" data-week="' + l.id + '"><button class="nav" data-wk="-1" aria-label="前の週"' + (ui.week <= 0 ? " disabled" : "") + ">‹</button>";
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(start, i), dw = parse(d).getDay();
+    const head = '<span class="w' + (dw === 0 ? " sun" : dw === 6 ? " sat" : "") + '">' + WD[dw] + '</span><span class="d">' + (i === 0 || parse(d).getDate() === 1 ? (parse(d).getMonth() + 1) + "/" : "") + parse(d).getDate() + "</span>";
+    if (!days.includes(d)) { h += '<span class="cell none">' + head + '<span class="m">－</span><span class="t">&nbsp;</span></span>'; continue; }
+    const s = seatMark(l, d);
+    h += '<button class="cell ' + s.cls + '" data-pick="' + l.id + "_" + d + '" title="' + jp(d) + " " + l.start + (s.left > 0 ? " 残り" + s.left + "席" : " 満席") + '"' + (s.left > 0 ? "" : " disabled") + ">" + head + '<span class="m">' + s.m + '</span><span class="t">' + l.start + "</span></button>";
+  }
+  return h + '<button class="nav" data-wk="1" aria-label="次の週"' + (ui.week >= 7 ? " disabled" : "") + ">›</button></div>";
+}
+function bookingSheet() {
+  const [lid, d] = ui.pick.split("_"); const l = lesson(lid); const s = studio(l.studio);
+  const left = l.cap - booked(lid, d);
+  return '<div class="sheet-bg" id="sheet" data-act="closeSheet"><aside class="sheet" role="dialog" aria-label="予約の入力"><div class="ph" style="' + photo(s) + '"><button class="close" data-act="closeSheet" aria-label="閉じる">×</button></div><div class="in">' +
+    '<div class="lhead"><span class="tag blue">' + esc(genre(l.genre).name) + '</span>' + (l.level ? '<span class="tag">' + esc(l.level) + "</span>" : "") + '</div><h3 style="font-family:var(--f-head);font-size:20px;margin:0">' + esc(l.title) + "</h3>" +
+    '<dl class="when"><dt>日時</dt><dd>' + jp(d) + ' <span class="num">' + l.start + "–" + l.end + "</span></dd><dt>スタジオ</dt><dd>" + esc(s.name) + "（" + esc(s.access) + "）</dd><dt>講師</dt><dd>" + esc(l.teacher) + '</dd><dt>料金</dt><dd class="num">¥' + Number(l.price).toLocaleString() + "</dd><dt>空き</dt><dd>残り " + left + " 席</dd></dl>" +
+    '<form class="form" id="bookForm" style="margin-top:14px"><label>お名前<input id="bName" autocomplete="name" placeholder="例）甲野 花子" value="' + esc(ui.fName || "") + '"></label><label>メールアドレス<input id="bMail" type="email" autocomplete="email" placeholder="例）hanako@example.com" value="' + esc(ui.fMail || "") + '"></label><div class="err" id="bErr">' + esc(ui.err) + '</div><button class="btn" type="submit" id="bSubmit">この内容で予約する</button><button class="btn sub" type="button" data-act="back">日程を選び直す</button></form></div></aside></div>';
+}
 function viewBook() {
-  const steps = ["スタジオ", "ジャンル", "レッスン", "予約"];
-  let h = '<h1>レッスンのご予約</h1><p class="lead">スタジオ → ジャンル → レッスン → お名前の入力、の4ステップです。</p><ol class="steps">' +
-    steps.map((s, i) => '<li class="' + (ui.step === i + 1 ? "on" : ui.step > i + 1 ? "done" : "") + '">' + (i + 1) + ". " + s + "</li>").join("") + "</ol>";
+  const steps = ["スタジオ", "ジャンル", "レッスンと日程", "予約"];
+  const flow = '<ol class="flow">' + steps.map((s, i) => '<li class="' + (ui.step === i + 1 || (ui.done && i === 3) ? "on" : ui.step > i + 1 ? "done" : "") + '">' + s + "</li>").join("") + "</ol>";
+  const s = ui.studio ? studio(ui.studio) : null;
+  const crumb = '<div class="crumb"><button data-act="toStudios">スタジオ一覧</button>' + (s ? '<span class="sep">›</span>' + (ui.step > 2 ? '<button data-act="toGenres">' + esc(s.name) + "</button>" : "<span>" + esc(s.name) + "</span>") : "") + (ui.genre && ui.step > 2 ? '<span class="sep">›</span><span>' + esc(genre(ui.genre).name) + "</span>" : "") + "</div>";
   if (ui.done) {
     const b = ui.done, l = lesson(b.lesson);
-    return h + '<div class="done-box" id="done"><b>ご予約を受け付けました</b><p>' + esc(studio(l.studio).name) + "／" + esc(l.title) + "<br>" + jp(b.date) + " " + l.start + "〜" + l.end + "<br>" + esc(b.name) + " 様</p>" +
-      '<p style="font-size:12.5px;color:var(--muted)">スタジオへの通知メール ' + studio(l.studio).notify.length + " 件" + (db.confirmToCustomer ? "・お客様への確認メール 1 件" : "") + " を送信箱に記録しました（管理画面で確認できます）。</p>" +
-      '<button class="btn sub" data-act="restart">続けて予約する</button></div>';
+    return '<h1>ご予約を受け付けました</h1>' + flow + '<div class="done-box reveal" id="done"><b>' + esc(b.name) + " 様、ありがとうございます</b><p>" + esc(studio(l.studio).name) + "／" + esc(l.title) + '<br><span class="num">' + jp(b.date) + " " + l.start + "–" + l.end + "</span></p>" +
+      '<p style="font-size:12.5px;color:var(--sub)">スタジオへの通知メール ' + studio(l.studio).notify.length + " 件" + (db.confirmToCustomer ? "・お客様への確認メール 1 件" : "") + " を送信箱に記録しました（管理画面で確認できます）。</p>" +
+      '<button class="btn sub" data-act="restart">ほかのレッスンも予約する</button></div>';
   }
   if (ui.step === 1) {
-    h += '<div class="cards">' + db.studios.map(s => '<button class="card" data-studio="' + s.id + '" style="--c:' + s.color + '"><b>' + esc(s.name) + "</b><span>" + esc(s.area) + "・レッスン " + db.lessons.filter(l => l.studio === s.id).length + " 種類</span></button>").join("") + "</div>";
-  } else if (ui.step === 2) {
-    const s = studio(ui.studio);
-    const gs = db.genres.filter(g => db.lessons.some(l => l.studio === s.id && l.genre === g.id));
-    h += '<button class="back" data-act="back">← スタジオを選び直す</button><h2>' + esc(s.name) + " のジャンル</h2>" +
-      (gs.length ? '<div class="cards">' + gs.map(g => '<button class="card" data-genre="' + g.id + '" style="--c:' + s.color + '"><b>' + esc(g.name) + "</b><span>" + db.lessons.filter(l => l.studio === s.id && l.genre === g.id).map(l => esc(l.title)).join("・") + "</span></button>").join("") + "</div>" : "<p>このスタジオにはまだレッスンがありません。</p>");
-  } else if (ui.step === 3) {
-    const s = studio(ui.studio);
-    const rows = occurrences(l => l.studio === ui.studio && l.genre === ui.genre, TODAY, addDays(TODAY, HORIZON));
-    h += '<button class="back" data-act="back">← ジャンルを選び直す</button><h2>' + esc(s.name) + "・" + esc(genre(ui.genre).name) + "（今日から8週間）</h2>" +
-      (rows.length ? rows.map(({ l, d }) => {
-        const left = l.cap - booked(l.id, d);
-        return '<div class="lesson-row" data-row="' + l.id + "_" + d + '"><span class="d">' + jp(d) + "<br>" + l.start + "〜" + l.end + '</span><span class="t">' + esc(l.title) + "<small>" + esc(l.teacher) + "・" + esc(ruleText(l.rule)) + "</small></span>" +
-          '<span class="chip ' + (left > 0 ? "ok" : "bad") + '">' + (left > 0 ? "残り " + left + " 席" : "満席") + '</span><button class="btn" data-pick="' + l.id + "_" + d + '" ' + (left > 0 ? "" : "disabled") + ">選ぶ</button></div>";
-      }).join("") : "<p>予約できる日程がありません。</p>");
-  } else {
-    const [lid, d] = ui.pick.split("_"); const l = lesson(lid);
-    h += '<button class="back" data-act="back">← レッスンを選び直す</button><div class="panel"><b>' + esc(studio(l.studio).name) + "／" + esc(l.title) + "</b><br>" + jp(d) + " " + l.start + "〜" + l.end + "（" + esc(l.teacher) + "）" +
-      '<form class="form" id="bookForm" style="margin-top:12px"><label>お名前<input id="bName" autocomplete="name" placeholder="例）甲野 花子" value="' + esc(ui.fName || "") + '"></label><label>メールアドレス<input id="bMail" type="email" autocomplete="email" placeholder="例）hanako@example.com" value="' + esc(ui.fMail || "") + '"></label><div class="err" id="bErr">' + esc(ui.err) + '</div><button class="btn" type="submit" id="bSubmit">この内容で予約する</button></form></div>';
+    return "<h1>レッスンを予約する</h1><p class=\"lead\">通いたいスタジオを選んでください。空いている日がすぐに分かります。</p>" + flow +
+      '<div class="studios">' + db.studios.map(st => {
+        const gs = db.genres.filter(g => db.lessons.some(l => l.studio === st.id && l.genre === g.id));
+        const n = occurrences(l => l.studio === st.id, TODAY, addDays(TODAY, 6)).length;
+        return '<button class="scard reveal" data-studio="' + st.id + '"><div class="ph" style="' + photo(st) + '"><span class="badge">今週 ' + n + " レッスン</span></div><div class=\"body\"><b>" + esc(st.name) + '</b><div class="meta"><span>' + esc(st.access) + "</span><span>" + esc(st.size) + '</span></div><div class="genres">' + gs.map(g => '<span class="tag">' + esc(g.name) + "</span>").join("") + "</div></div></button>";
+      }).join("") + "</div>";
   }
+  if (ui.step === 2) {
+    const gs = db.genres.filter(g => db.lessons.some(l => l.studio === s.id && l.genre === g.id));
+    return crumb + "<h1>" + esc(s.name) + '</h1><p class="lead">' + esc(s.access) + "・" + esc(s.size) + "　ジャンルを選んでください。</p>" + flow +
+      (gs.length ? '<div class="chips">' + gs.map(g => '<button class="chip-btn" data-genre="' + g.id + '">' + esc(g.name) + "<small>" + db.lessons.filter(l => l.studio === s.id && l.genre === g.id).length + " クラス</small></button>").join("") + "</div>" : '<div class="empty">このスタジオにはまだレッスンがありません。</div>') +
+      '<div class="ph" style="' + photo(s) + ';aspect-ratio:21/8;border-radius:8px"></div>';
+  }
+  const ls = db.lessons.filter(l => l.studio === ui.studio && l.genre === ui.genre);
+  const from = addDays(TODAY, ui.week * 7);
+  let h = crumb + "<h1>" + esc(s.name) + "・" + esc(genre(ui.genre).name) + '</h1><p class="lead"><span class="num">' + jp(from) + " 〜 " + jp(addDays(from, 6)) + "</span>　◎ 空きあり　○ あと少し　△ 残りわずか　× 満席</p>" + flow;
+  h += ls.map(l => '<article class="lcard" data-row="' + l.id + '"><div class="ph" style="' + photo(s) + '"><span class="badge">定員 ' + l.cap + ' 名</span></div><div><div class="lhead"><span class="tag blue">今すぐ予約できます</span>' + (l.level ? '<span class="tag">' + esc(l.level) + "</span>" : "") + '<span class="tag">' + esc(ruleText(l.rule)) + "</span></div><h3>" + esc(l.title) + '</h3><div class="meta"><span>' + esc(l.teacher) + '</span><span class="num">' + l.start + "–" + l.end + "</span><span>" + esc(s.access) + '</span></div><div class="price"><small>1回</small><b>¥' + Number(l.price).toLocaleString() + "</b></div>" + weekStrip(l) + "</div></article>").join("");
+  if (ui.step === 4 && ui.pick) h += bookingSheet();
   return h;
 }
 
@@ -318,7 +418,7 @@ function viewAdmin() {
   return h;
 }
 
-function blankLesson() { return { id: "", studio: "s1", genre: "g1", title: "", teacher: "", start: "19:00", end: "20:00", cap: 10, rule: { kind: "weekly", weekday: 1, anchor: TODAY, nths: [1], date: TODAY, start: "", end: "", skips: [] } }; }
+function blankLesson() { return { id: "", studio: "s1", genre: "g1", title: "", teacher: "", level: "", price: 2200, start: "19:00", end: "20:00", cap: 10, rule: { kind: "weekly", weekday: 1, anchor: TODAY, nths: [1], date: TODAY, start: "", end: "", skips: [] } }; }
 function adminLessons() {
   const e = ui.edit || (ui.edit = blankLesson());
   const r = e.rule;
@@ -327,7 +427,7 @@ function adminLessons() {
     '<label>スタジオ<select id="fStudio">' + db.studios.map(s => '<option value="' + s.id + '"' + (e.studio === s.id ? " selected" : "") + ">" + esc(s.name) + "</option>").join("") + "</select></label>" +
     '<label>ジャンル<select id="fGenre">' + db.genres.map(g => '<option value="' + g.id + '"' + (e.genre === g.id ? " selected" : "") + ">" + esc(g.name) + "</option>").join("") + "</select></label>" +
     '<label>レッスン名<input id="fTitle" value="' + esc(e.title) + '" placeholder="例）HIPHOP 初級"></label><label>講師<input id="fTeacher" value="' + esc(e.teacher) + '"></label>' +
-    '<div class="inline"><label>開始<input id="fStart" type="time" value="' + e.start + '"></label><label>終了<input id="fEnd" type="time" value="' + e.end + '"></label><label>定員<input id="fCap" type="number" min="1" max="100" value="' + e.cap + '" style="width:80px"></label></div>' +
+    '<div class="inline"><label>開始<input id="fStart" type="time" value="' + e.start + '"></label><label>終了<input id="fEnd" type="time" value="' + e.end + '"></label><label>定員<input id="fCap" type="number" min="1" max="100" value="' + e.cap + '" style="width:80px"></label><label>料金（円）<input id="fPrice" type="number" min="0" step="100" value="' + (e.price || 0) + '" style="width:100px"></label></div><label>対象（任意）<input id="fLevel" value="' + esc(e.level || "") + '" placeholder="例）初心者歓迎"></label>' +
     '<div class="rule-box"><b>繰り返し設定</b><div class="inline">' +
     [["weekly", "毎週"], ["biweekly", "隔週"], ["monthly", "毎月（第◯週）"], ["once", "1回だけ"]].map(([k, v]) => '<label><input type="radio" name="kind" value="' + k + '"' + (r.kind === k ? " checked" : "") + "> " + v + "</label>").join("") + "</div>" +
     (r.kind === "once" ? '<label>日付<input id="fDate" type="date" value="' + r.date + '"></label>' :
@@ -359,7 +459,7 @@ function readLessonForm() {
   const e = ui.edit, $ = id => document.getElementById(id);
   if (!$("lessonForm")) return;
   e.studio = $("fStudio").value; e.genre = $("fGenre").value; e.title = $("fTitle").value; e.teacher = $("fTeacher").value;
-  e.start = $("fStart").value; e.end = $("fEnd").value; e.cap = Number($("fCap").value);
+  e.start = $("fStart").value; e.end = $("fEnd").value; e.cap = Number($("fCap").value); e.price = Number($("fPrice").value) || 0; e.level = $("fLevel").value.trim();
   const r = e.rule;
   r.kind = document.querySelector('input[name="kind"]:checked').value;
   if ($("fDate")) r.date = $("fDate").value;
@@ -383,15 +483,19 @@ function validLesson(e) {
 document.getElementById("tabs").addEventListener("click", ev => { const b = ev.target.closest("button[data-tab]"); if (!b) return; ui.tab = b.dataset.tab; ui.err = ""; render(); });
 document.getElementById("reset").addEventListener("click", () => { db = seed(); save(); Object.assign(ui, { step: 1, done: null, pick: null, edit: null, err: "" }); render(); });
 document.getElementById("app").addEventListener("click", ev => {
+  if (ev.target.id === "sheet") { ui.step = 3; ui.err = ""; render(); return; }
   const t = ev.target.closest("button,[data-ev]"); if (!t) return;
   const d = t.dataset;
   if (d.studio) { ui.studio = d.studio; ui.step = 2; }
-  else if (d.genre) { ui.genre = d.genre; ui.step = 3; }
+  else if (d.genre) { ui.genre = d.genre; ui.step = 3; ui.week = 0; }
   else if (d.pick) { ui.pick = d.pick; ui.step = 4; ui.err = ""; }
-  else if (d.act === "back") { ui.step = Math.max(1, ui.step - 1); ui.err = ""; }
-  else if (d.act === "restart") { Object.assign(ui, { step: 1, done: null, pick: null }); }
+  else if (d.act === "back" || d.act === "closeSheet") { ui.step = Math.max(1, ui.step - 1); ui.err = ""; }
+  else if (d.act === "toStudios") { Object.assign(ui, { step: 1, studio: null, genre: null, pick: null, err: "" }); }
+  else if (d.act === "toGenres") { Object.assign(ui, { step: 2, genre: null, pick: null, err: "" }); }
+  else if (d.wk) { ui.week = Math.min(7, Math.max(0, ui.week + Number(d.wk))); }
+  else if (d.act === "restart") { Object.assign(ui, { step: 1, done: null, pick: null, studio: null, genre: null, week: 0 }); }
   else if (d.cal) { const [y, m] = ui.calMonth.split("-").map(Number); const n = new Date(y, m - 1 + Number(d.cal), 1); ui.calMonth = n.getFullYear() + "-" + pad(n.getMonth() + 1); }
-  else if (d.ev) { if (d.ro) return; const [lid] = d.ev.split("_"); const l = lesson(lid); Object.assign(ui, { tab: "book", studio: l.studio, genre: l.genre, pick: d.ev, step: 4, done: null, err: "" }); }
+  else if (d.ev) { if (d.ro) return; const [lid, dd] = d.ev.split("_"); const l = lesson(lid); Object.assign(ui, { tab: "book", studio: l.studio, genre: l.genre, pick: d.ev, step: 4, done: null, err: "", week: Math.max(0, Math.min(7, Math.floor((parse(dd) - parse(TODAY)) / 604800000))) }); }
   else if (d.admin) { ui.adminTab = d.admin; ui.err = ""; }
   else if (d.editlesson) { ui.edit = JSON.parse(JSON.stringify(lesson(d.editlesson))); ui.edit.rule = Object.assign({ anchor: TODAY, nths: [1], date: TODAY, start: "", end: "", skips: [] }, ui.edit.rule); ui.err = ""; window.scrollTo(0, 0); }
   else if (d.act === "cancelEdit") { ui.edit = null; ui.err = ""; }
@@ -434,6 +538,9 @@ document.getElementById("app").addEventListener("submit", ev => {
   }
   render();
 });
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && ui.tab === "book" && ui.step === 4) { ui.step = 3; ui.err = ""; render(); } });
+const CREDITS = [["p1", "West End Centre Aldershot Dance Studio", "Jack1956", "CC0"], ["p2", "Dance Studio First", "Douglas P. Perkins", "CC BY 2.0"], ["p4", "KC Ballet Studio 3", "KCBalletMedia", "CC BY 2.0"]];
+document.getElementById("credits").innerHTML = "写真はイメージです（実在のスタジオではありません）。出典：Wikimedia Commons — " + CREDITS.map(c => esc(c[1]) + "（" + esc(c[2]) + "・" + c[3] + "）").join("／");
 window.__demo = { expand, matches, ruleText };
 render();
 </script>
