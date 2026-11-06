@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ダンススタジオ予約サイト デモ</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="複数スタジオのレッスン予約と、繰り返し日程の自動展開・管理画面のデモ（架空データ）">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<style>
+/* 白ベース固定（端末がダークモードでも暗くしない） */
+:root,:root[data-theme="dark"]{color-scheme:light}
+:root{
+  --bg:#f6f5f2; --surface:#fff; --ink:#1d1b22; --muted:#66626e; --line:#e2dfe6;
+  --accent:#c2185b; --accent-soft:#fce4ec; --ok:#2e7d4f; --ok-soft:#e3f3e8; --bad:#b3261e; --bad-soft:#fbe5e3;
+  --s1:#c2185b; --s2:#1565c0; --s3:#ef6c00;
+  --f-head:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+  --f-body:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.65}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 16px;max-width:1200px;margin:0 auto}
+.brand{margin-right:auto;font-family:var(--f-head);font-weight:900;font-size:19px;letter-spacing:.03em}
+.brand small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-left:8px}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{border:1px solid transparent;background:none;padding:6px 12px;border-radius:999px;color:var(--muted)}
+nav.tabs button[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.note{background:#fff8e1;font-size:12px}
+.note div{max-width:1200px;margin:0 auto;padding:6px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.note button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:2px 10px;font-size:12px}
+main{max-width:1200px;margin:0 auto;padding:18px 16px 60px}
+h1{font-family:var(--f-head);font-size:24px;margin:0 0 4px}
+h2{font-size:13px;letter-spacing:.08em;color:var(--muted);margin:22px 0 8px}
+.lead{color:var(--muted);margin:0 0 16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px;padding:0;list-style:none}
+.steps li{padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:12.5px}
+.steps li.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.steps li.done{color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-top:5px solid var(--c,var(--accent))}
+.card:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.card b{display:block;font-family:var(--f-head);font-size:17px}
+.card span{color:var(--muted);font-size:12.5px}
+.back{border:0;background:none;color:var(--accent);padding:0;margin-bottom:10px}
+.lesson-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface);margin-bottom:8px}
+.lesson-row .d{font-weight:700;min-width:150px}
+.lesson-row .t{flex:1;min-width:180px}
+.lesson-row .t small{color:var(--muted);display:block}
+.chip{display:inline-block;font-size:11.5px;padding:1px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.btn{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:8px 16px;font-weight:700}
+.btn:disabled{background:#c9c5cd;cursor:not-allowed}
+.btn.sub{background:var(--surface);color:var(--ink);border:1px solid var(--line);font-weight:400}
+.form{display:grid;gap:12px;max-width:520px}
+.form label{display:grid;gap:4px;font-size:13px}
+.form input,.form select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)}
+.err{color:var(--bad);font-size:13px;min-height:1.2em}
+.done-box{border:2px solid var(--ok);background:var(--ok-soft);border-radius:12px;padding:16px}
+/* カレンダー */
+.cal-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.cal-head b{font-family:var(--f-head);font-size:18px;min-width:120px}
+.cal-head select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--surface)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface)}
+.cal .wd{font-size:12px;text-align:center;padding:4px;color:var(--muted);border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg)}
+.cal .day{min-height:96px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px;font-size:11.5px;min-width:0}
+.cal .day.out{background:#faf9f7;color:#aaa}
+.cal .day.today .n{background:var(--accent);color:#fff;border-radius:999px;padding:0 6px}
+.cal .n{font-weight:700;font-size:12px}
+.ev{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);border-radius:4px;padding:1px 4px;margin-top:3px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);margin-right:4px}
+@media (max-width:700px){.cal .day{min-height:70px}.ev{font-size:10px}}
+/* 管理画面 */
+.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sub-tabs button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px}
+.sub-tabs button[aria-current="page"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;background:var(--surface);font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.rule-box{border:1px dashed var(--accent);border-radius:10px;padding:12px;display:grid;gap:10px;background:#fffafc}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inline label{display:flex;gap:4px;align-items:center}
+.preview{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px 12px 8px 34px;background:var(--surface);font-size:13px}
+.preview li{margin:2px 0}
+.mail{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);margin-bottom:8px}
+.mail .mh{font-size:12px;color:var(--muted)}
+.mail pre{white-space:pre-wrap;font-family:var(--f-body);margin:6px 0 0}
+.tag-del{border:0;background:none;color:var(--bad);font-size:12px}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <div class="brand">ダンススタジオ予約<small>デモ（架空のスタジオ・架空のデータ）</small></div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="book" id="tab-book">予約サイト（お客様の画面）</button>
+    <button data-tab="calendar" id="tab-calendar">スタジオのカレンダー</button>
+    <button data-tab="admin" id="tab-admin">管理画面</button>
+  </nav>
+</div></header>
+<div class="note"><div><span>このデモはブラウザの中だけで動きます。メールは実際には送らず「送信箱」に記録します。</span><button id="reset">見本の状態に戻す</button></div></div>
+<main id="app"></main>
+<script>
+"use strict";
+// ===== 日付の道具（すべて端末の暦日・'YYYY-MM-DD' で扱う） =====
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+const WD = ["日", "月", "火", "水", "木", "金", "土"];
+const jp = s => { const d = parse(s); return (d.getMonth() + 1) + "月" + d.getDate() + "日（" + WD[d.getDay()] + "）"; };
+const TODAY = ymd(new Date());
+
+// ===== 繰り返し設定 → 日付の一覧（このデモの中心） =====
+// rule = {kind:'weekly'|'biweekly'|'monthly'|'once', weekday, anchor, nths:[1..5,-1], date, start, end, skips:[]}
+function nthOfMonth(d) { return Math.ceil(d.getDate() / 7); }
+function isLastOfMonth(d) { const n = new Date(d); n.setDate(n.getDate() + 7); return n.getMonth() !== d.getMonth(); }
+function matches(rule, s) {
+  const d = parse(s);
+  if (rule.kind === "once") return s === rule.date;
+  if (d.getDay() !== Number(rule.weekday)) return false;
+  if (rule.kind === "weekly") return true;
+  if (rule.kind === "biweekly") {
+    const diff = Math.round((parse(s) - parse(rule.anchor)) / 86400000);
+    return diff >= 0 && diff % 14 === 0;
+  }
+  if (rule.kind === "monthly") {
+    const nths = (rule.nths || []).map(Number);
+    return nths.includes(nthOfMonth(d)) || (nths.includes(-1) && isLastOfMonth(d));
+  }
+  return false;
+}
+function expand(rule, from, to) {
+  const out = [];
+  const lo = rule.start && rule.start > from ? rule.start : from;
+  const hi = rule.end && rule.end < to ? rule.end : to;
+  if (rule.kind === "biweekly" && !rule.anchor) return out;
+  for (let s = lo; s <= hi; s = addDays(s, 1)) {
+    if ((rule.skips || []).includes(s)) continue;
+    if (matches(rule, s)) out.push(s);
+  }
+  return out;
+}
+function ruleText(r) {
+  if (r.kind === "once") return jp(r.date) + " の1回のみ";
+  const w = WD[r.weekday] + "曜";
+  let t = r.kind === "weekly" ? "毎週 " + w
+    : r.kind === "biweekly" ? "隔週 " + w + "（" + jp(r.anchor) + " から）"
+    : "毎月 " + (r.nths || []).map(n => n === -1 || n === "-1" ? "最終" : "第" + n).join("・") + " " + w;
+  if (r.start) t += "／" + jp(r.start) + "〜";
+  if (r.end) t += (r.start ? "" : "／〜") + jp(r.end);
+  if ((r.skips || []).length) t += "／休み " + r.skips.length + "日";
+  return t;
+}
+
+// ===== 見本データ =====
+function seed() {
+  const nextWd = wd => { let s = TODAY; while (parse(s).getDay() !== wd) s = addDays(s, 1); return s; };
+  return {
+    studios: [
+      { id: "s1", name: "スタジオ中央", area: "駅前・3F", color: "var(--s1)", notify: ["center@example.com", "owner@example.com"] },
+      { id: "s2", name: "スタジオ東口", area: "東口・B1", color: "var(--s2)", notify: ["east@example.com", "owner@example.com"] },
+      { id: "s3", name: "スタジオ港南", area: "港南・2F", color: "var(--s3)", notify: ["konan@example.com"] },
+    ],
+    genres: [
+      { id: "g1", name: "HIPHOP" }, { id: "g2", name: "JAZZ" }, { id: "g3", name: "K-POP" },
+      { id: "g4", name: "キッズ" }, { id: "g5", name: "バレエ" },
+    ],
+    lessons: [
+      { id: "l1", studio: "s1", genre: "g1", title: "HIPHOP 初級", teacher: "講師 甲野", start: "19:00", end: "20:15", cap: 12, rule: { kind: "weekly", weekday: 2 } },
+      { id: "l2", studio: "s1", genre: "g3", title: "K-POP 入門", teacher: "講師 乙野", start: "18:00", end: "19:00", cap: 15, rule: { kind: "biweekly", weekday: 5, anchor: nextWd(5) } },
+      { id: "l3", studio: "s1", genre: "g5", title: "大人バレエ", teacher: "講師 丙野", start: "10:30", end: "12:00", cap: 8, rule: { kind: "monthly", weekday: 6, nths: [1, 3] } },
+      { id: "l4", studio: "s2", genre: "g2", title: "JAZZ 中級", teacher: "講師 丁野", start: "20:00", end: "21:15", cap: 10, rule: { kind: "weekly", weekday: 4 } },
+      { id: "l5", studio: "s2", genre: "g4", title: "キッズ HIPHOP", teacher: "講師 甲野", start: "16:30", end: "17:30", cap: 14, rule: { kind: "weekly", weekday: 3 } },
+      { id: "l6", studio: "s2", genre: "g1", title: "HIPHOP 振付クラス", teacher: "講師 戊野", start: "19:30", end: "21:00", cap: 12, rule: { kind: "monthly", weekday: 0, nths: [-1] } },
+      { id: "l7", studio: "s3", genre: "g3", title: "K-POP カバー", teacher: "講師 乙野", start: "19:00", end: "20:30", cap: 2, rule: { kind: "weekly", weekday: 1 } },
+      { id: "l8", studio: "s3", genre: "g4", title: "キッズ チア", teacher: "講師 丙野", start: "17:00", end: "18:00", cap: 12, rule: { kind: "monthly", weekday: 6, nths: [2] } },
+    ],
+    bookings: [],
+    outbox: [],
+    confirmToCustomer: true,
+  };
+}
+const KEY = "dance-booking-demo-v1";
+let db;
+try { db = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch (e) { db = seed(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { /* 保存できない環境でも画面は動かす */ } };
+const studio = id => db.studios.find(s => s.id === id);
+const genre = id => db.genres.find(g => g.id === id);
+const lesson = id => db.lessons.find(l => l.id === id);
+const booked = (lid, date) => db.bookings.filter(b => b.lesson === lid && b.date === date).length;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const HORIZON = 56; // 予約できるのは今日から8週間先まで
+
+// ===== 画面の状態 =====
+const ui = { tab: "book", step: 1, studio: null, genre: null, pick: null, done: null, calStudio: "all", calMonth: TODAY.slice(0, 7), adminTab: "cal", edit: null, err: "" };
+
+function occurrences(filter, from, to) {
+  const rows = [];
+  for (const l of db.lessons) {
+    if (filter && !filter(l)) continue;
+    for (const d of expand(l.rule, from, to)) rows.push({ l, d });
+  }
+  rows.sort((a, b) => (a.d + a.l.start).localeCompare(b.d + b.l.start));
+  return rows;
+}
+
+// ===== 予約サイト =====
+function viewBook() {
+  const steps = ["スタジオ", "ジャンル", "レッスン", "予約"];
+  let h = '<h1>レッスンのご予約</h1><p class="lead">スタジオ → ジャンル → レッスン → お名前の入力、の4ステップです。</p><ol class="steps">' +
+    steps.map((s, i) => '<li class="' + (ui.step === i + 1 ? "on" : ui.step > i + 1 ? "done" : "") + '">' + (i + 1) + ". " + s + "</li>").join("") + "</ol>";
+  if (ui.done) {
+    const b = ui.done, l = lesson(b.lesson);
+    return h + '<div class="done-box" id="done"><b>ご予約を受け付けました</b><p>' + esc(studio(l.studio).name) + "／" + esc(l.title) + "<br>" + jp(b.date) + " " + l.start + "〜" + l.end + "<br>" + esc(b.name) + " 様</p>" +
+      '<p style="font-size:12.5px;color:var(--muted)">スタジオへの通知メール ' + studio(l.studio).notify.length + " 件" + (db.confirmToCustomer ? "・お客様への確認メール 1 件" : "") + " を送信箱に記録しました（管理画面で確認できます）。</p>" +
+      '<button class="btn sub" data-act="restart">続けて予約する</button></div>';
+  }
+  if (ui.step === 1) {
+    h += '<div class="cards">' + db.studios.map(s => '<button class="card" data-studio="' + s.id + '" style="--c:' + s.color + '"><b>' + esc(s.name) + "</b><span>" + esc(s.area) + "・レッスン " + db.lessons.filter(l => l.studio === s.id).length + " 種類</span></button>").join("") + "</div>";
+  } else if (ui.step === 2) {
+    const s = studio(ui.studio);
+    const gs = db.genres.filter(g => db.lessons.some(l => l.studio === s.id && l.genre === g.id));
+    h += '<button class="back" data-act="back">← スタジオを選び直す</button><h2>' + esc(s.name) + " のジャンル</h2>" +
+      (gs.length ? '<div class="cards">' + gs.map(g => '<button class="card" data-genre="' + g.id + '" style="--c:' + s.color + '"><b>' + esc(g.name) + "</b><span>" + db.lessons.filter(l => l.studio === s.id && l.genre === g.id).map(l => esc(l.title)).join("・") + "</span></button>").join("") + "</div>" : "<p>このスタジオにはまだレッスンがありません。</p>");
+  } else if (ui.step === 3) {
+    const s = studio(ui.studio);
+    const rows = occurrences(l => l.studio === ui.studio && l.genre === ui.genre, TODAY, addDays(TODAY, HORIZON));
+    h += '<button class="back" data-act="back">← ジャンルを選び直す</button><h2>' + esc(s.name) + "・" + esc(genre(ui.genre).name) + "（今日から8週間）</h2>" +
+      (rows.length ? rows.map(({ l, d }) => {
+        const left = l.cap - booked(l.id, d);
+        return '<div class="lesson-row" data-row="' + l.id + "_" + d + '"><span class="d">' + jp(d) + "<br>" + l.start + "〜" + l.end + '</span><span class="t">' + esc(l.title) + "<small>" + esc(l.teacher) + "・" + esc(ruleText(l.rule)) + "</small></span>" +
+          '<span class="chip ' + (left > 0 ? "ok" : "bad") + '">' + (left > 0 ? "残り " + left + " 席" : "満席") + '</span><button class="btn" data-pick="' + l.id + "_" + d + '" ' + (left > 0 ? "" : "disabled") + ">選ぶ</button></div>";
+      }).join("") : "<p>予約できる日程がありません。</p>");
+  } else {
+    const [lid, d] = ui.pick.split("_"); const l = lesson(lid);
+    h += '<button class="back" data-act="back">← レッスンを選び直す</button><div class="panel"><b>' + esc(studio(l.studio).name) + "／" + esc(l.title) + "</b><br>" + jp(d) + " " + l.start + "〜" + l.end + "（" + esc(l.teacher) + "）" +
+      '<form class="form" id="bookForm" style="margin-top:12px"><label>お名前<input id="bName" autocomplete="name" placeholder="例）甲野 花子" value="' + esc(ui.fName || "") + '"></label><label>メールアドレス<input id="bMail" type="email" autocomplete="email" placeholder="例）hanako@example.com" value="' + esc(ui.fMail || "") + '"></label><div class="err" id="bErr">' + esc(ui.err) + '</div><button class="btn" type="submit" id="bSubmit">この内容で予約する</button></form></div>';
+  }
+  return h;
+}
+
+function submitBooking(name, mail) {
+  const [lid, d] = ui.pick.split("_"); const l = lesson(lid);
+  if (!name.trim()) return "お名前を入力してください。";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return "メールアドレスの形が正しくありません。";
+  if (!expand(l.rule, d, d).length) return "この日程は予約できなくなりました。選び直してください。";
+  if (booked(lid, d) >= l.cap) return "満席になりました。別の日程をお選びください。";
+  if (db.bookings.some(b => b.lesson === lid && b.date === d && b.mail.toLowerCase() === mail.toLowerCase())) return "このメールアドレスでは同じレッスンを予約済みです。";
+  const b = { id: "b" + Date.now(), lesson: lid, date: d, name: name.trim(), mail: mail.trim(), at: new Date().toLocaleString("ja-JP") };
+  db.bookings.push(b);
+  const s = studio(l.studio);
+  const body = "予約が入りました。\n\nスタジオ：" + s.name + "\nレッスン：" + l.title + "（" + l.teacher + "）\n日時：" + jp(d) + " " + l.start + "〜" + l.end + "\nお名前：" + b.name + " 様\nメール：" + b.mail + "\n残り：" + (l.cap - booked(lid, d)) + " 席";
+  for (const to of s.notify) db.outbox.unshift({ to, subject: "【予約】" + s.name + " " + jp(d) + " " + l.title, body, at: b.at });
+  if (db.confirmToCustomer) db.outbox.unshift({ to: b.mail, subject: "【ご予約確認】" + l.title + " " + jp(d), body: b.name + " 様\n\nご予約ありがとうございます。\n" + s.name + "（" + s.area + "）\n" + jp(d) + " " + l.start + "〜" + l.end + "\n" + l.title, at: b.at });
+  save();
+  ui.done = b; ui.err = "";
+  return "";
+}
+
+// ===== カレンダー（スタジオ別／全スタジオ） =====
+function calendar(studioFilter, clickable) {
+  const [y, m] = ui.calMonth.split("-").map(Number);
+  const first = new Date(y, m - 1, 1);
+  const startS = addDays(ymd(first), -first.getDay());
+  const last = ymd(new Date(y, m, 0));
+  const endS = addDays(last, 6 - parse(last).getDay());
+  const rows = occurrences(l => studioFilter === "all" || l.studio === studioFilter, startS, endS);
+  let h = '<div class="cal-head"><button class="btn sub" data-cal="-1" aria-label="前の月">‹</button><b id="calTitle">' + y + "年" + m + '月</b><button class="btn sub" data-cal="1" aria-label="次の月">›</button>' +
+    '<select id="calStudio"><option value="all">全スタジオ</option>' + db.studios.map(s => '<option value="' + s.id + '"' + (studioFilter === s.id ? " selected" : "") + ">" + esc(s.name) + "</option>").join("") + "</select></div>";
+  h += '<div class="cal">' + WD.map(w => '<div class="wd">' + w + "</div>").join("");
+  for (let s = startS; s <= endS; s = addDays(s, 1)) {
+    const evs = rows.filter(r => r.d === s);
+    h += '<div class="day' + (s.slice(0, 7) !== ui.calMonth ? " out" : "") + (s === TODAY ? " today" : "") + '" data-day="' + s + '"><span class="n">' + parse(s).getDate() + "</span>" +
+      evs.map(({ l, d }) => '<button class="ev" style="--c:' + studio(l.studio).color + '" title="' + esc(studio(l.studio).name + " " + l.title + " " + l.start) + '" data-ev="' + l.id + "_" + d + '"' + (clickable && d >= TODAY && d <= addDays(TODAY, HORIZON) ? "" : ' data-ro="1"') + ">" + l.start + " " + esc(genre(l.genre).name) + (booked(l.id, d) ? "・" + booked(l.id, d) + "名" : "") + "</button>").join("") + "</div>";
+  }
+  h += '</div><div class="legend">' + db.studios.map(s => '<span><i style="--c:' + s.color + '"></i>' + esc(s.name) + "</span>").join("") + "</div>";
+  return h;
+}
+function viewCalendar() {
+  return '<h1>スタジオのカレンダー</h1><p class="lead">スタジオごとのレッスン予定です。予定を押すと、そのレッスンの予約へ進みます。</p><div class="panel">' + calendar(ui.calStudio, true) + "</div>";
+}
+
+// ===== 管理画面 =====
+function viewAdmin() {
+  const tabs = [["cal", "全スタジオの予定"], ["lessons", "レッスンと繰り返し設定"], ["genres", "ジャンル"], ["bookings", "予約一覧"], ["mail", "通知先と送信箱"]];
+  let h = '<h1>管理画面</h1><p class="lead">スタジオ運営者の画面です（デモのためログインは省いています）。</p><div class="sub-tabs">' +
+    tabs.map(([k, v]) => '<button data-admin="' + k + '" id="adm-' + k + '"' + (ui.adminTab === k ? ' aria-current="page"' : "") + ">" + v + "</button>").join("") + "</div>";
+  if (ui.adminTab === "cal") h += '<div class="panel">' + calendar(ui.calStudio, false) + "</div>";
+  if (ui.adminTab === "lessons") h += adminLessons();
+  if (ui.adminTab === "genres") h += adminGenres();
+  if (ui.adminTab === "bookings") {
+    const rows = db.bookings.slice().sort((a, b) => (a.date + lesson(a.lesson).start).localeCompare(b.date + lesson(b.lesson).start));
+    h += '<div class="panel"><table id="bookTable"><thead><tr><th>日時</th><th>スタジオ</th><th>レッスン</th><th>お名前</th><th>メール</th><th>受付</th></tr></thead><tbody>' +
+      (rows.length ? rows.map(b => { const l = lesson(b.lesson); return "<tr><td>" + jp(b.date) + " " + l.start + "</td><td>" + esc(studio(l.studio).name) + "</td><td>" + esc(l.title) + "</td><td>" + esc(b.name) + "</td><td>" + esc(b.mail) + "</td><td>" + esc(b.at) + "</td></tr>"; }).join("") : '<tr><td colspan="6">まだ予約はありません。</td></tr>') + "</tbody></table></div>";
+  }
+  if (ui.adminTab === "mail") {
+    h += '<div class="grid2"><div class="panel"><h2 style="margin-top:0">予約が入った時の通知先（スタジオごと・複数可）</h2>' +
+      db.studios.map(s => '<div style="margin-bottom:12px"><b>' + esc(s.name) + '</b><div class="inline">' + s.notify.map((m, i) => '<span class="chip">' + esc(m) + ' <button class="tag-del" data-delmail="' + s.id + "_" + i + '" aria-label="削除">×</button></span>').join("") + '</div><form class="inline" data-addmail="' + s.id + '" style="margin-top:6px"><input type="email" placeholder="追加するアドレス" style="border:1px solid var(--line);border-radius:8px;padding:5px 8px"><button class="btn sub">追加</button></form></div>').join("") +
+      '<label class="inline"><input type="checkbox" id="confirmToCustomer"' + (db.confirmToCustomer ? " checked" : "") + '> 予約したお客様にも確認メールを送る</label><div class="err" id="mailErr">' + esc(ui.err) + '</div></div><div class="panel"><h2 style="margin-top:0">送信箱（デモ・実際には送りません）</h2><div id="outbox">' +
+      (db.outbox.length ? db.outbox.slice(0, 30).map(o => '<div class="mail"><div class="mh">宛先 <b>' + esc(o.to) + "</b>・" + esc(o.at) + "</div><b>" + esc(o.subject) + "</b><pre>" + esc(o.body) + "</pre></div>").join("") : "<p>まだ送信はありません。予約サイトで予約すると、ここに通知が届きます。</p>") + "</div></div></div>";
+  }
+  return h;
+}
+
+function blankLesson() { return { id: "", studio: "s1", genre: "g1", title: "", teacher: "", start: "19:00", end: "20:00", cap: 10, rule: { kind: "weekly", weekday: 1, anchor: TODAY, nths: [1], date: TODAY, start: "", end: "", skips: [] } }; }
+function adminLessons() {
+  const e = ui.edit || (ui.edit = blankLesson());
+  const r = e.rule;
+  const prev = expand(r, TODAY, addDays(TODAY, 90));
+  let h = '<div class="grid2"><div class="panel"><h2 style="margin-top:0">' + (e.id ? "レッスンを編集" : "レッスンを追加") + '</h2><form class="form" id="lessonForm">' +
+    '<label>スタジオ<select id="fStudio">' + db.studios.map(s => '<option value="' + s.id + '"' + (e.studio === s.id ? " selected" : "") + ">" + esc(s.name) + "</option>").join("") + "</select></label>" +
+    '<label>ジャンル<select id="fGenre">' + db.genres.map(g => '<option value="' + g.id + '"' + (e.genre === g.id ? " selected" : "") + ">" + esc(g.name) + "</option>").join("") + "</select></label>" +
+    '<label>レッスン名<input id="fTitle" value="' + esc(e.title) + '" placeholder="例）HIPHOP 初級"></label><label>講師<input id="fTeacher" value="' + esc(e.teacher) + '"></label>' +
+    '<div class="inline"><label>開始<input id="fStart" type="time" value="' + e.start + '"></label><label>終了<input id="fEnd" type="time" value="' + e.end + '"></label><label>定員<input id="fCap" type="number" min="1" max="100" value="' + e.cap + '" style="width:80px"></label></div>' +
+    '<div class="rule-box"><b>繰り返し設定</b><div class="inline">' +
+    [["weekly", "毎週"], ["biweekly", "隔週"], ["monthly", "毎月（第◯週）"], ["once", "1回だけ"]].map(([k, v]) => '<label><input type="radio" name="kind" value="' + k + '"' + (r.kind === k ? " checked" : "") + "> " + v + "</label>").join("") + "</div>" +
+    (r.kind === "once" ? '<label>日付<input id="fDate" type="date" value="' + r.date + '"></label>' :
+      '<label>曜日<select id="fWd">' + WD.map((w, i) => '<option value="' + i + '"' + (Number(r.weekday) === i ? " selected" : "") + ">" + w + "曜</option>").join("") + "</select></label>" +
+      (r.kind === "biweekly" ? '<label>初回の日（ここから2週間おき）<input id="fAnchor" type="date" value="' + (r.anchor || TODAY) + '"></label>' : "") +
+      (r.kind === "monthly" ? '<div class="inline" id="fNths">' + [[1, "第1"], [2, "第2"], [3, "第3"], [4, "第4"], [5, "第5"], [-1, "最終"]].map(([n, v]) => '<label><input type="checkbox" value="' + n + '"' + ((r.nths || []).map(Number).includes(n) ? " checked" : "") + "> " + v + "</label>").join("") + '</div><small style="color:var(--muted)">1つだけ選ぶと「月1回」、複数選ぶと「特定の週」になります。</small>' : "") +
+      '<div class="inline"><label>期間の開始<input id="fFrom" type="date" value="' + (r.start || "") + '"></label><label>終了<input id="fTo" type="date" value="' + (r.end || "") + '"></label></div>' +
+      '<div class="inline"><label>休みにする日<input id="fSkip" type="date"></label><button class="btn sub" type="button" data-act="addskip">休みに追加</button></div>' +
+      ((r.skips || []).length ? '<div class="inline">' + r.skips.map((s, i) => '<span class="chip bad">' + jp(s) + ' <button class="tag-del" type="button" data-delskip="' + i + '">×</button></span>').join("") + "</div>" : "")) +
+    '</div><div class="err" id="lErr">' + esc(ui.err) + '</div><div class="inline"><button class="btn" type="submit" id="lSave">' + (e.id ? "変更を保存" : "このレッスンを追加") + "</button>" + (e.id ? '<button class="btn sub" type="button" data-act="cancelEdit">編集をやめる</button>' : "") + "</div></form></div>" +
+    '<div class="panel"><h2 style="margin-top:0">この設定で作られる日程（今日から90日）</h2><p id="ruleText" style="margin:0 0 6px"><b>' + esc(ruleText(r)) + "</b></p><p style='margin:0 0 8px;color:var(--muted)' id=\"prevCount\">" + prev.length + ' 回</p><ol class="preview" id="preview">' + prev.map(s => "<li>" + jp(s) + "</li>").join("") + "</ol></div></div>";
+  h += '<h2>登録済みのレッスン</h2><div class="panel" style="padding:0"><table id="lessonTable"><thead><tr><th>スタジオ</th><th>レッスン</th><th>時間</th><th>繰り返し</th><th>定員</th><th></th></tr></thead><tbody>' +
+    db.lessons.map(l => "<tr><td>" + esc(studio(l.studio).name) + "</td><td>" + esc(l.title) + "<br><small>" + esc(genre(l.genre).name) + "・" + esc(l.teacher) + "</small></td><td>" + l.start + "〜" + l.end + "</td><td>" + esc(ruleText(l.rule)) + "</td><td>" + l.cap + '</td><td><button class="btn sub" data-editlesson="' + l.id + '">編集</button></td></tr>').join("") + "</tbody></table></div>";
+  return h;
+}
+function adminGenres() {
+  return '<div class="panel"><h2 style="margin-top:0">ジャンル（予約サイトの「ジャンル選択」に出ます）</h2><table id="genreTable"><thead><tr><th>ジャンル名</th><th>使っているレッスン</th><th></th></tr></thead><tbody>' +
+    db.genres.map(g => { const n = db.lessons.filter(l => l.genre === g.id).length; return '<tr><td><input data-gname="' + g.id + '" value="' + esc(g.name) + '" style="border:1px solid var(--line);border-radius:6px;padding:4px 8px"></td><td>' + n + ' 件</td><td><button class="btn sub" data-delgenre="' + g.id + '"' + (n ? ' disabled title="使っているレッスンがあるため削除できません"' : "") + ">削除</button></td></tr>"; }).join("") +
+    '</tbody></table><form class="inline" id="genreForm" style="margin-top:12px"><input id="gNew" placeholder="新しいジャンル名（例：ブレイキン）" style="border:1px solid var(--line);border-radius:8px;padding:6px 10px"><button class="btn">ジャンルを追加</button></form><div class="err" id="gErr">' + esc(ui.err) + "</div></div>";
+}
+
+// ===== 描画とイベント =====
+function render() {
+  document.querySelectorAll("#tabs button").forEach(b => { if (b.dataset.tab === ui.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  const app = document.getElementById("app");
+  app.innerHTML = ui.tab === "book" ? viewBook() : ui.tab === "calendar" ? viewCalendar() : viewAdmin();
+}
+function readLessonForm() {
+  const e = ui.edit, $ = id => document.getElementById(id);
+  if (!$("lessonForm")) return;
+  e.studio = $("fStudio").value; e.genre = $("fGenre").value; e.title = $("fTitle").value; e.teacher = $("fTeacher").value;
+  e.start = $("fStart").value; e.end = $("fEnd").value; e.cap = Number($("fCap").value);
+  const r = e.rule;
+  r.kind = document.querySelector('input[name="kind"]:checked').value;
+  if ($("fDate")) r.date = $("fDate").value;
+  if ($("fWd")) r.weekday = Number($("fWd").value);
+  if ($("fAnchor")) r.anchor = $("fAnchor").value;
+  if ($("fNths")) r.nths = [...$("fNths").querySelectorAll("input:checked")].map(i => Number(i.value));
+  if ($("fFrom")) r.start = $("fFrom").value;
+  if ($("fTo")) r.end = $("fTo").value;
+}
+function validLesson(e) {
+  const r = e.rule;
+  if (!e.title.trim()) return "レッスン名を入力してください。";
+  if (!e.start || !e.end || e.end <= e.start) return "終了時刻は開始時刻より後にしてください。";
+  if (!(e.cap >= 1 && e.cap <= 100)) return "定員は1〜100で入力してください。";
+  if (r.kind === "once" && !r.date) return "日付を選んでください。";
+  if (r.kind === "biweekly" && (!r.anchor || parse(r.anchor).getDay() !== Number(r.weekday))) return "隔週の初回の日は、選んだ曜日の日付にしてください。";
+  if (r.kind === "monthly" && !(r.nths || []).length) return "第何週かを1つ以上選んでください。";
+  if (r.start && r.end && r.end < r.start) return "期間の終了は開始より後にしてください。";
+  return "";
+}
+document.getElementById("tabs").addEventListener("click", ev => { const b = ev.target.closest("button[data-tab]"); if (!b) return; ui.tab = b.dataset.tab; ui.err = ""; render(); });
+document.getElementById("reset").addEventListener("click", () => { db = seed(); save(); Object.assign(ui, { step: 1, done: null, pick: null, edit: null, err: "" }); render(); });
+document.getElementById("app").addEventListener("click", ev => {
+  const t = ev.target.closest("button,[data-ev]"); if (!t) return;
+  const d = t.dataset;
+  if (d.studio) { ui.studio = d.studio; ui.step = 2; }
+  else if (d.genre) { ui.genre = d.genre; ui.step = 3; }
+  else if (d.pick) { ui.pick = d.pick; ui.step = 4; ui.err = ""; }
+  else if (d.act === "back") { ui.step = Math.max(1, ui.step - 1); ui.err = ""; }
+  else if (d.act === "restart") { Object.assign(ui, { step: 1, done: null, pick: null }); }
+  else if (d.cal) { const [y, m] = ui.calMonth.split("-").map(Number); const n = new Date(y, m - 1 + Number(d.cal), 1); ui.calMonth = n.getFullYear() + "-" + pad(n.getMonth() + 1); }
+  else if (d.ev) { if (d.ro) return; const [lid] = d.ev.split("_"); const l = lesson(lid); Object.assign(ui, { tab: "book", studio: l.studio, genre: l.genre, pick: d.ev, step: 4, done: null, err: "" }); }
+  else if (d.admin) { ui.adminTab = d.admin; ui.err = ""; }
+  else if (d.editlesson) { ui.edit = JSON.parse(JSON.stringify(lesson(d.editlesson))); ui.edit.rule = Object.assign({ anchor: TODAY, nths: [1], date: TODAY, start: "", end: "", skips: [] }, ui.edit.rule); ui.err = ""; window.scrollTo(0, 0); }
+  else if (d.act === "cancelEdit") { ui.edit = null; ui.err = ""; }
+  else if (d.act === "addskip") { readLessonForm(); const v = document.getElementById("fSkip").value; if (v && !ui.edit.rule.skips.includes(v)) { ui.edit.rule.skips.push(v); ui.edit.rule.skips.sort(); } }
+  else if (d.delskip) { readLessonForm(); ui.edit.rule.skips.splice(Number(d.delskip), 1); }
+  else if (d.delgenre) { db.genres = db.genres.filter(g => g.id !== d.delgenre || db.lessons.some(l => l.genre === g.id)); save(); }
+  else if (d.delmail) { const [sid, i] = d.delmail.split("_"); const s = studio(sid); if (s.notify.length <= 1) { ui.err = "通知先は1件以上残してください。"; } else { s.notify.splice(Number(i), 1); ui.err = ""; save(); } }
+  else return;
+  render();
+});
+document.getElementById("app").addEventListener("change", ev => {
+  const t = ev.target;
+  if (t.id === "calStudio") { ui.calStudio = t.value; render(); }
+  else if (t.id === "confirmToCustomer") { db.confirmToCustomer = t.checked; save(); }
+  else if (t.dataset.gname) { const v = t.value.trim(); if (v) { genre(t.dataset.gname).name = v; save(); } render(); }
+  else if (t.closest("#lessonForm") && t.id !== "fSkip") { readLessonForm(); ui.err = ""; render(); }
+});
+document.getElementById("app").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const f = ev.target;
+  if (f.id === "bookForm") {
+    ui.fName = document.getElementById("bName").value; ui.fMail = document.getElementById("bMail").value;
+    ui.err = submitBooking(ui.fName, ui.fMail);
+    if (!ui.err) { ui.fName = ""; ui.fMail = ""; }
+  }
+  else if (f.id === "lessonForm") {
+    readLessonForm(); const e = ui.edit; ui.err = validLesson(e);
+    if (!ui.err) {
+      if (e.id) { db.lessons[db.lessons.findIndex(l => l.id === e.id)] = e; } else { e.id = "l" + Date.now(); db.lessons.push(e); }
+      save(); ui.edit = null;
+    }
+  } else if (f.id === "genreForm") {
+    const v = document.getElementById("gNew").value.trim();
+    ui.err = !v ? "ジャンル名を入力してください。" : db.genres.some(g => g.name === v) ? "同じ名前のジャンルがあります。" : "";
+    if (!ui.err) { db.genres.push({ id: "g" + Date.now(), name: v }); save(); }
+  } else if (f.dataset.addmail) {
+    const v = f.querySelector("input").value.trim(); const s = studio(f.dataset.addmail);
+    ui.err = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "メールアドレスの形が正しくありません。" : s.notify.includes(v) ? "登録済みのアドレスです。" : "";
+    if (!ui.err) { s.notify.push(v); save(); }
+  }
+  render();
+});
+window.__demo = { expand, matches, ruleText };
+render();
+</script>
+
+</body>
+</html>
